@@ -11,13 +11,15 @@ input:
 
 output:
 
-    #include <stdio.h>
+```c
+#include <stdio.h>
 
-    void
-    main(void)
-    {
-        printf("hello, world\n");
-    }
+void
+main(void)
+{
+    printf("hello, world\n");
+}
+```
 
 ## let syntax from go :=
 
