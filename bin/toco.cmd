@@ -1,7 +1,7 @@
 @echo off
 set here=%~dp0
-set py_dir=%here%..\src\py\
+set src_dir=%here%..\src\
 rem echo %here%
-rem echo %py_dir%
-python %py_dir%toco.py %1
+rem echo %src_dir%
+python %src_dir%toco.py %1
 
