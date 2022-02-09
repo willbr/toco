@@ -3,7 +3,6 @@ import sys
 import argparse
 
 from parse2_syntax import is_atom, puts_expr
-from pprint import pprint
 from ie import parse_file
 
 
@@ -44,7 +43,6 @@ class CompilationUnit():
     def read_file(self, filename):
         self.filenames.append(filename)
         prog = parse_file(filename)
-        # pprint(prog)
 
         for x in prog:
             head, *args = x
@@ -554,7 +552,6 @@ class CompilationUnit():
         for name, spec in self.functions.items():
             if name == 'main':
                 continue
-            # pprint(spec)
             params, returns, body = spec
             if body == ():
                 continue
@@ -566,7 +563,6 @@ class CompilationUnit():
 
 
         for name, spec in self.functions.items():
-            # pprint(spec)
             params, returns, body = spec
             if body == ():
                 continue
