@@ -2,8 +2,8 @@ import os
 import sys
 import argparse
 
-from parse2_syntax import is_atom, puts_expr
-from ie import parse_file
+from ie.src.py.parse2_syntax import is_atom, puts_expr
+from ie.src.py.ie import parse_file
 
 
 class CompilationUnit():
