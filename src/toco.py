@@ -689,6 +689,7 @@ def print_block(body, depth):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("-o", "--outfile", default="-")
     parser.add_argument("file", nargs='+')
     args = parser.parse_args()
 
