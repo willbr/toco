@@ -4,6 +4,25 @@ import argparse
 
 from ie.src.py.parse2_syntax import is_atom, puts_expr
 from ie.src.py.ie import parse_file
+from rich.console import Console
+
+console = Console(markup=False)
+python_print = print
+print = console.print
+
+class Rope():
+    def __init__(self):
+        self.lines = [[]]
+        pass
+
+    def add(self, s):
+        self.lines[-1].append(s)
+
+    def add_line(self, line=""):
+        self.lines.append([line])
+
+    def render(self):
+        return '\n'.join(''.join(line) for line in self.lines)
 
 
 class CompilationUnit():
@@ -542,11 +561,13 @@ class CompilationUnit():
         return x.replace('-', '_')
 
 
-    def print(self):
+    def render(self):
+        lines = Rope()
         for e in self.top_level:
-            print(e)
+            lines.add_line(e)
+
         if self.top_level:
-            print()
+            lines.add_line()
 
         func_decls = 0
         for name, spec in self.functions.items():
@@ -555,21 +576,30 @@ class CompilationUnit():
             params, returns, body = spec
             if body == ():
                 continue
-            print_func_decl(name, params, returns, ' ')
-            print(';')
+            print_func_decl(lines, name, params, returns, ' ')
+            lines.add(';')
             func_decls += 1
+
         if func_decls:
-            print('\n')
+            lines.add_line()
 
 
         for name, spec in self.functions.items():
             params, returns, body = spec
             if body == ():
                 continue
-            print_func_decl(name, params, returns)
-            print(" ", end="")
-            print_block(body, 1)
-            print()
+            print_func_decl(lines, name, params, returns)
+            lines.add(' ')
+
+            print_block(lines, body, 1)
+            lines.add_line()
+
+        return lines
+
+
+    def print(self):
+        lines = self.render()
+        print(lines.render())
 
 
 def compile_comment(*args):
@@ -588,12 +618,15 @@ def compile_returns(spec):
     return spec[0]
 
 
-def print_func_decl(name, params, returns, sep='\n'):
+def print_func_decl(lines, name, params, returns, sep='\n'):
     if params:
         cparams = ', '.join(params)
     else:
         cparams = 'void'
-    print(f"{returns}{sep}{name}({cparams})", end="")
+    code = f"{returns}{sep}{name}({cparams})"
+    decl = code.split('\n')
+    for l in decl:
+        lines.add_line(l)
 
 
 def compile_var(args, body):
@@ -670,26 +703,28 @@ def split_newline(x):
         return lhs, rhs
 
 
-def print_block(body, depth):
-    print("{")
+def print_block(lines, body, depth):
     indent = "    " * depth
 
+    lines.add("{")
+
     for s in body:
-        print(indent, end="")
+        lines.add_line()
+        lines.add(indent)
         if isinstance(s, str):
-            print(s)
+            lines.add(s)
         else:
             head, sub = s
-            print(head + " ", end="")
-            print_block(sub, depth+1)
+            lines.add(head + " ")
+            print_block(lines, sub, depth+1)
 
     indent = "    " * (depth-1)
-    print(indent + "}")
+    lines.add_line(indent + "}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-o", "--outfile", default="-")
+    parser.add_argument("-o", "--outfile")
     parser.add_argument("file", nargs='+')
     args = parser.parse_args()
 
@@ -698,5 +733,10 @@ if __name__ == "__main__":
     for file in args.file:
         cu.read_file(file)
 
-    cu.print()
+    if args.outfile == None:
+        cu.print()
+    else:
+        lines = cu.render().render()
+        with open(args.outfile, 'w') as f:
+            f.write(lines)
 
