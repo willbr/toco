@@ -1,4 +1,4 @@
-import stdio
+include-lib "stdio.h"
 
 def main(argc int, argv **char) int
     puts "press a enter"
