@@ -226,7 +226,7 @@ class CompilationUnit():
         elif head == 'if':
             return self.compile_if(args, body)
         elif head == 'comment':
-            return self.compile_comment(*args, *body)
+            return compile_comment(*args, *body)
         elif head == 'return':
             return self.compile_return_statement(*args, *body)
 
