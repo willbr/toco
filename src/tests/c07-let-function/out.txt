@@ -1,0 +1,11 @@
+int double(int n);
+int
+main(int argc, char **argv) {
+    int a = double(10);
+    return a;
+}
+int
+double(int n) {
+    return n * 2;
+}
+

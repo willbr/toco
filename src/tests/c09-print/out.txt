@@ -1,0 +1,13 @@
+#include <stdio.h>
+enum toco_keyword {
+    keyword_hello,
+    keyword_goodbye
+};
+typedef enum toco_keyword toco_keyword;
+
+int
+main(int argc, char **argv) {
+    printf("hello = %d, num = %d, float = %2.2f\n", keyword_hello, 10, 3.6);
+    printf("goodbye = %d\n", keyword_goodbye);
+}
+

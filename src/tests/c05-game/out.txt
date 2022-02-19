@@ -1,0 +1,39 @@
+#include <stdio.h>
+#define true -1
+#define false 0
+typedef float f32;
+typedef unsigned int u32;
+struct ball {
+    u32 x;
+    u32 y;
+    f32 width;
+    f32 height;
+};
+
+u32 step = 0;
+int game_is_running = true;
+struct ball ball = {0};
+
+void update(void);void render(void);
+int
+main(int arg, char **argv) {
+    game_is_running = true;
+    while (game_is_running) {
+        update();
+        render();
+    }
+    return 0;
+}
+void
+update(void) {
+    if (step > 10) {
+        game_is_running = false;
+    }
+    ball.x += 2;
+    step += 1;
+}
+void
+render(void) {
+    printf("%*sX\n", ball.x, "");
+}
+
