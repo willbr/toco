@@ -1,0 +1,12 @@
+#include <stdio.h>
+enum toco_keyword {
+    keyword_poop
+};
+typedef enum toco_keyword toco_keyword;
+
+int
+main(int argc, char **argv) {
+    toco_keyword poop = keyword_poop;
+    printf("poop=%d\n", poop);
+}
+
