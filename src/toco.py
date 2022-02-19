@@ -17,11 +17,12 @@ class Rope():
         self.lines = [[]]
         pass
 
-    def add(self, s):
+    def write(self, s):
         self.lines[-1].append(s)
 
-    def add_line(self, line=""):
-        self.lines.append([line])
+    def write_line(self, line=""):
+        self.lines[-1].append(line)
+        self.lines.append([])
 
     def render(self):
         return '\n'.join(''.join(line) for line in self.lines)
@@ -564,10 +565,10 @@ class CompilationUnit():
     def render(self):
         lines = Rope()
         for e in self.top_level:
-            lines.add_line(e)
+            lines.write_line(e)
 
         if self.top_level:
-            lines.add_line()
+            lines.write_line("")
 
         func_decls = 0
         for name, spec in self.functions.items():
@@ -576,30 +577,27 @@ class CompilationUnit():
             params, returns, body = spec
             if body == ():
                 continue
-            print_func_decl(lines, name, params, returns, ' ')
-            lines.add(';')
+            print_func_decl(lines, name, params, returns, ' ', ';')
             func_decls += 1
 
         if func_decls:
-            lines.add_line()
+            lines.write_line("")
 
 
         for name, spec in self.functions.items():
             params, returns, body = spec
             if body == ():
                 continue
-            print_func_decl(lines, name, params, returns)
-            lines.add(' ')
+            print_func_decl(lines, name, params, returns, '\n', ' ')
 
             print_block(lines, body, 1)
-            lines.add_line()
+            lines.write_line("")
 
-        return lines
+        return lines.render()
 
 
     def print(self):
-        lines = self.render()
-        print(lines.render())
+        print(self.render())
 
 
 def compile_comment(*args):
@@ -618,15 +616,18 @@ def compile_returns(spec):
     return spec[0]
 
 
-def print_func_decl(lines, name, params, returns, sep='\n'):
+def print_func_decl(lines, name, params, returns, sep, end):
     if params:
         cparams = ', '.join(params)
     else:
         cparams = 'void'
-    code = f"{returns}{sep}{name}({cparams})"
-    decl = code.split('\n')
-    for l in decl:
-        lines.add_line(l)
+    code = f"{returns}{sep}{name}({cparams}){end}"
+    *body, final = code.split('\n')
+
+    for l in body:
+        lines.write_line(l)
+
+    lines.write(final)
 
 
 def compile_var(args, body):
@@ -706,20 +707,20 @@ def split_newline(x):
 def print_block(lines, body, depth):
     indent = "    " * depth
 
-    lines.add("{")
+    lines.write_line("{")
 
     for s in body:
-        lines.add_line()
-        lines.add(indent)
+        lines.write(indent)
         if isinstance(s, str):
-            lines.add(s)
+            lines.write_line(s)
         else:
             head, sub = s
-            lines.add(head + " ")
+            lines.write(head + " ")
             print_block(lines, sub, depth+1)
+            lines.write_line("")
 
     indent = "    " * (depth-1)
-    lines.add_line(indent + "}")
+    lines.write(indent + "}")
 
 
 if __name__ == "__main__":
@@ -736,7 +737,7 @@ if __name__ == "__main__":
     if args.outfile == None:
         cu.print()
     else:
-        lines = cu.render().render()
+        lines = cu.render()
         with open(args.outfile, 'w') as f:
             f.write(lines)
 
