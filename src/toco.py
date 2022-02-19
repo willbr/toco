@@ -10,6 +10,8 @@ console = Console(markup=False)
 python_print = print
 print = console.print
 
+here = os.path.abspath(os.path.dirname(__file__))
+
 class Rope():
     def __init__(self):
         self.lines = [[]]
@@ -26,30 +28,28 @@ class Rope():
 
 
 class CompilationUnit():
-    libs = set()
-    types = {
-            'char': 'short',
-            'short': 'short',
-            'int': 'int',
-            'long': 'long',
-            }
-    structs = {}
-    functions = {}
-    global_vars = {}
-    top_level = []
-    keywords = set()
-    infix_symbols = """
-    = := == !=
-    + += - -= * *= / /=
-    > >= < <=
-    and or
-    """.split()
-    filenames = []
-    lib_directories = []
-
-
     def __init__(self, filename=None):
-        here = os.path.abspath(os.path.dirname(__file__))
+        self.libs = set()
+        self.types = {
+                'char': 'short',
+                'short': 'short',
+                'int': 'int',
+                'long': 'long',
+                }
+        self.structs = {}
+        self.functions = {}
+        self.global_vars = {}
+        self.top_level = []
+        self.keywords = set()
+        self.infix_symbols = """
+        = := == !=
+        + += - -= * *= / /=
+        > >= < <=
+        and or
+        """.split()
+        self.filenames = []
+        self.lib_directories = []
+
         libs_dir = os.path.abspath(os.path.join(here, '../libs'))
 
         self.lib_directories.append(os.path.abspath(os.path.curdir))
