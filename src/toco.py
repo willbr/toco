@@ -30,7 +30,7 @@ class Rope():
 
 class CompilationUnit():
     def __init__(self, filename=None):
-        self.libs = set()
+        self.libs = []
         self.types = {
                 'char': 'short',
                 'short': 'short',
@@ -41,7 +41,7 @@ class CompilationUnit():
         self.functions = {}
         self.global_vars = {}
         self.top_level = []
-        self.keywords = set()
+        self.keywords = []
         self.infix_symbols = """
         = := == !=
         + += - -= * *= / /=
@@ -165,7 +165,7 @@ class CompilationUnit():
         assert body[0] == 'ie/newline'
         body = body[1:]
         assert len(body) == 0
-        self.libs.add(lib_name)
+        self.libs.append(lib_name)
         name = lib_name.strip('"')
         clib = f"#include <{name}>"
         self.top_level.append(clib)
@@ -557,7 +557,7 @@ class CompilationUnit():
         if x[0] == ':':
             keyword = x[1:]
             if keyword not in self.keywords:
-                self.keywords.add(keyword)
+                self.keywords.append(keyword)
             x = 'keyword_' + keyword
         return x.replace('-', '_')
 
