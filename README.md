@@ -62,3 +62,27 @@ unique enums
         poop := :poop
         println "{poop =d}"
 
+## todo
+
+### carray
+
+    line := carray(10, char, "")
+
+to
+
+    char line[10] = "";
+
+### array
+
+    line := array(10 char, "")
+
+to
+
+    struct char_array {
+        size_t len;
+        size_t cap;
+        char *data;
+    };
+
+    char_array line = {10, 10, (char[10]){}};
+
