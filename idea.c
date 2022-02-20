@@ -51,7 +51,7 @@ struct cstring *
 alloc_cstring(const char *s)
 {
     size_t slen = strlen(s);
-    size_t cap  = slen * 2;
+    size_t cap  = (slen * 2) + 1;
     struct array_char *r =
         alloc_array(slen, cap, s, slen + 1, sizeof(char));
     return r;
