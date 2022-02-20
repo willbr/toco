@@ -64,7 +64,7 @@ unique enums
 
 ## todo
 
-### carray
+### c array
 
     line := carray(10, char, "")
 
@@ -72,17 +72,41 @@ to
 
     char line[10] = "";
 
-### array
+### fat array
 
-    line := array(10 char, "")
+    sprites := array(40, sprite)
 
 to
 
-    struct char_array {
-        size_t len;
-        size_t cap;
-        char *data;
-    };
+```c
+struct fat_array {
+    size_t len;
+    size_t cap;
+    void *data;
+};
 
-    char_array line = {10, 10, (char[10]){}};
+void * alloc_array(size_t len, size_t cap, const char *data, size_t data_size, size_t elem_size);
+
+sprites = alloc_array(40, 40, NULL, 0, sizeof(struct sprite))
+```
+
+
+### fat cstring
+    line := "hello, world!"
+
+to
+
+```
+struct cstring {
+    size_t len;
+    size_t cap;
+    char *data;
+};
+
+void * alloc_array(size_t len, size_t cap, const char *data, size_t data_size, size_t elem_size);
+struct cstring * alloc_cstring(const char *s);
+
+struct cstring *line = alloc_cstring("");
+printf("%s\n", line->data);
+```
 
