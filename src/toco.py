@@ -41,6 +41,7 @@ class CompilationUnit():
         self.functions = {}
         self.global_vars = {}
         self.top_level = []
+        self.toco_header = []
         self.keywords = []
         self.infix_symbols = """
         = := == !=
@@ -239,14 +240,22 @@ class CompilationUnit():
         assert body == []
         num_args = len(args)
         assert num_args == 2
+
         var_name, x = args
         var_type = self.infer_type(x)
         var_val = self.compile_expression(x)
+
+        if var_type == 'cstring':
+            h = "typedef char *cstring;"
+            if h not in self.toco_header:
+                self.toco_header.append(h)
+
         if x[0] == 'ie/neoteric':
             _, cmd, arg = x
             if cmd in self.types.keys():
                 if cmd == var_type:
                     var_val = self.compile_expression(arg)
+
         return f"{var_type} {var_name} = {var_val}"
 
 
@@ -256,11 +265,11 @@ class CompilationUnit():
             if first_char == ':':
                 return 'toco_keyword'
             elif first_char == '"':
-                return 'string'
+                return 'cstring'
 
             try:
                 n = int(x)
-                return 'integer'
+                return 'int'
             except ValueError:
                 pass
 
@@ -564,6 +573,10 @@ class CompilationUnit():
 
     def render(self):
         lines = Rope()
+
+        for e in self.toco_header:
+            lines.write_line(e)
+
         for e in self.top_level:
             lines.write_line(e)
 
