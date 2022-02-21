@@ -256,7 +256,7 @@ class CompilationUnit():
                 if cmd == var_type:
                     var_val = self.compile_expression(arg)
 
-        return f"{var_type} {var_name} = {var_val}"
+        return self.compile_var_decl(var_name, var_type, var_val)
 
 
     def infer_type(self, x):
