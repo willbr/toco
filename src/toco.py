@@ -285,12 +285,17 @@ class CompilationUnit():
         head, *rest = x
         if head == 'ie/neoteric':
             cmd = rest[0]
-            if cmd in self.types.keys():
+            if self.is_type(cmd):
                 return cmd
             params, returns, body = self.functions[cmd]
             return returns
         else:
             assert False
+
+
+    def is_type(self, type_name):
+        base_type = type_name.lstrip("*")
+        return base_type in self.types.keys()
 
 
     def compile_while(self, pred, body):
@@ -498,8 +503,11 @@ class CompilationUnit():
                 return "(" + r + ")"
             else:
                 return r
-        elif head in self.types.keys():
-            return f"({head})({', '.join(cargs)})"
+        elif self.is_type(head):
+            assert len(cargs) == 1
+            cast_name = self.compile_var_decl("", head)
+            # return f"({cast_name})({', '.join(cargs)})"
+            return f"({cast_name}){cargs[0]}"
         elif head == "inc":
             assert len(cargs) == 1
             return f"{cargs[0]} += 1"
@@ -734,6 +742,12 @@ def print_block(lines, body, depth):
 
     indent = "    " * (depth-1)
     lines.write(indent + "}")
+
+
+def is_string_literal(s):
+    if len(s) < 2:
+        return False
+    return s[0] == '"' and s[-1] == '"'
 
 
 if __name__ == "__main__":
