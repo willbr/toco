@@ -496,7 +496,12 @@ class CompilationUnit():
                 if rest == []:
                     return head
             elif head == 'ie/neoteric':
-                head, *rest = rest
+                if rest[1][0] == 'ie/prefix':
+                    aname = rest[0]
+                    index = transform_infix(rest[1][1:])
+                    head, *rest = ['aref', aname, index]
+                else:
+                    head, *rest = rest
 
         args, body = split_newline(rest)
         assert body == ()
@@ -517,6 +522,10 @@ class CompilationUnit():
         elif head == "inc":
             assert len(cargs) == 1
             return f"{cargs[0]} += 1"
+        elif head == 'aref':
+            assert len(cargs) == 2
+            aname, aindex = cargs
+            return f"{aname}[{aindex}]"
         else:
             return f"{head}({', '.join(cargs)})"
 

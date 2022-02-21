@@ -4,6 +4,8 @@ int
 main(void) {
     char a[10] = "hi";
     printf("%s\n", a);
+    a[1] = 'o';
+    printf("%s\n", a);
     return 0;
 }
 
