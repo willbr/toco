@@ -1,0 +1,7 @@
+include-lib "stdio.h"
+
+def main int
+    a := array(10, char, "hi")
+    println "{a s}"
+    return 0
+

@@ -243,7 +243,10 @@ class CompilationUnit():
 
         var_name, x = args
         var_type = self.infer_type(x)
-        var_val = self.compile_expression(x)
+        if var_type[0] == 'array':
+            var_val = initial_array_value(x)
+        else:
+            var_val = self.compile_expression(x)
 
         if var_type == 'cstring':
             h = "typedef char *cstring;"
@@ -287,6 +290,9 @@ class CompilationUnit():
             cmd = rest[0]
             if self.is_type(cmd):
                 return cmd
+            elif cmd == 'array':
+                infix, alen, comma1, atype = rest[1][:4]
+                return ['array', alen, atype]
             params, returns, body = self.functions[cmd]
             return returns
         else:
@@ -555,6 +561,10 @@ class CompilationUnit():
             while var_type[0] == '*':
                 lhs = "*" + lhs
                 var_type = var_type[1:]
+        elif var_type[0] == 'array':
+            _, alen, atype = var_type
+            rhs = f"[{alen}]"
+            var_type = atype
         else:
             var_type = ' '.join(var_type)
 
@@ -748,6 +758,19 @@ def is_string_literal(s):
     if len(s) < 2:
         return False
     return s[0] == '"' and s[-1] == '"'
+
+
+def initial_array_value(x):
+    n = len(x)
+    head, *rest = x
+    if head == 'ie/neoteric':
+        cmd = rest[0]
+        if cmd != 'array':
+            assert False
+        infix, alen, comma1, atype, comma2, aval = rest[1]
+        return aval
+    print(a)
+    assert False
 
 
 if __name__ == "__main__":
