@@ -1,0 +1,14 @@
+typedef char *cstring;
+#include <stdio.h>
+
+int
+main(void) {
+    cstring a = "hello";
+    printf("a=%p\n", a);
+    printf("a=%s\n", a);
+    *a = 'y';
+    *(a + 1) = 'i';
+    printf("a=%s\n", a);
+    return 0;
+}
+

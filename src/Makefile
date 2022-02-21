@@ -1,9 +1,11 @@
 wrun-tests:
 	watchexec -cr "make run-tests"
 
+d := tests\c13-pointers
+
 run-tests:
 	python test-python.py
-	type tests\c12-array\in.txt
-	type tests\c12-array\out.txt
-	type tests\c12-array\out.txt | tcc -run -
+	type $d\in.txt
+	type $d\out.txt
+	type $d\out.txt | tcc -run -
 

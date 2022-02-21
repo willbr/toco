@@ -239,6 +239,7 @@ class CompilationUnit():
         ce = self.compile_expression([head, *args])
         return ce + ";"
 
+
     def compile_let(self, args, body):
         assert body == []
         num_args = len(args)
@@ -246,6 +247,7 @@ class CompilationUnit():
 
         var_name, x = args
         var_type = self.infer_type(x)
+
         if var_type[0] == 'array':
             var_val = initial_array_value(x)
         else:
@@ -493,12 +495,15 @@ class CompilationUnit():
                 # print(1,head, rest)
                 nx = transform_infix(rest)
                 if is_atom(nx):
-                    return nx
+                    return self.mangle(nx)
                 head, *rest = nx
                 # print(2,head, rest)
                 if rest == []:
                     return head
             elif head == 'ie/neoteric':
+                if rest[0] == '*':
+                    rest[0] = 'deref'
+
                 if rest[1][0] == 'ie/prefix':
                     aname = rest[0]
                     index = transform_infix(rest[1][1:])
@@ -529,6 +534,9 @@ class CompilationUnit():
             assert len(cargs) == 2
             aname, aindex = cargs
             return f"{aname}[{aindex}]"
+        elif head == 'deref':
+            assert len(cargs) == 1
+            return f"*{cargs[0]}"
         else:
             return f"{head}({', '.join(cargs)})"
 
@@ -592,13 +600,16 @@ class CompilationUnit():
 
 
     def mangle(self, name):
-        x = name
+        if name == 'null':
+            return 'NULL'
+
+        x = name.replace('-', '_')
         if x[0] == ':':
             keyword = x[1:]
             if keyword not in self.keywords:
                 self.keywords.append(keyword)
             x = 'keyword_' + keyword
-        return x.replace('-', '_')
+        return x
 
 
     def render(self):
