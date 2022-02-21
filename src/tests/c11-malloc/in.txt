@@ -1,0 +1,11 @@
+include-lib "stdio.h"
+include-lib "stdlib.h"
+include-lib "string.h"
+
+def main(argc int, argv **char) int
+    s := *char(malloc(256))
+    memcpy s "hello" 6
+    println "{s s}"
+
+    return 0
+

@@ -1,0 +1,12 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int
+main(int argc, char **argv) {
+    char *s = (char *)malloc(256);
+    memcpy(s, "hello", 6);
+    printf("%s\n", s);
+    return 0;
+}
+
