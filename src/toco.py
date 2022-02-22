@@ -600,7 +600,9 @@ class CompilationUnit():
 
 
     def mangle(self, name):
-        if name == 'null':
+        if name == '':
+            return ''
+        elif name == 'null':
             return 'NULL'
 
         x = name.replace('-', '_')
