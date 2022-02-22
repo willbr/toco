@@ -133,7 +133,7 @@ class CompilationUnit():
                 assert False
 
             if raw_params[0] == 'ie/infix':
-                raw_params = split_on_commas(raw_params[1:])
+                raw_params = split_on_symbol(raw_params[1:], ',')
                 params = self.compile_params(raw_params)
             else:
                 assert False
@@ -224,6 +224,8 @@ class CompilationUnit():
 
         if head == 'while':
             return self.compile_while(args, body)
+        elif head == 'for':
+            return self.compile_for(args, body)
         elif head == 'var':
             return self.compile_var(args, body) + ";"
         elif head == ':=':
@@ -316,6 +318,15 @@ class CompilationUnit():
         cpred = self.compile_expression(transform_infix(pred))
         cbody = [self.compile_statement(s) for s in body]
         return f"while ({cpred})", cbody
+
+
+    def compile_for(self, header, body):
+        init, pred, step =split_on_symbol(header, ';')
+        cinit = self.compile_expression(transform_infix(init))
+        cpred = self.compile_expression(transform_infix(pred))
+        cstep = self.compile_expression(transform_infix(step))
+        cbody = [self.compile_statement(s) for s in body]
+        return f"for ({cinit}; {cpred}; {cstep})", cbody
 
 
     def compile_typedef(self, type_name, *body):
@@ -749,10 +760,10 @@ def compile_var(args, body):
         assert False
 
 
-def split_on_commas(lst):
+def split_on_symbol(lst, s):
     r = [[]]
     for e in lst:
-        if e == ',':
+        if e == s:
             r.append([])
         else:
             r[-1].append(e)
@@ -761,7 +772,7 @@ def split_on_commas(lst):
 
 def transform_infix(x):
     if ',' in x:
-        sections = split_on_commas(x)
+        sections = split_on_symbol(x, ',')
     else:
         sections = [x]
 
