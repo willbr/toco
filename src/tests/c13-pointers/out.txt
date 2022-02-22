@@ -2,12 +2,14 @@ typedef char *cstring;
 #include <stdio.h>
 
 int
-main(void) {
+main(int argc, char **argv) {
     cstring a = "hello";
+    char **ap = (char **)&a;
     printf("a=%p\n", a);
     printf("a=%s\n", a);
     *a = 'y';
     *(a + 1) = 'i';
+    *(*ap + 4) = 'i';
     printf("a=%s\n", a);
     return 0;
 }

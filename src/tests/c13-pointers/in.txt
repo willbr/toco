@@ -1,10 +1,12 @@
 include-lib "stdio.h"
 
-def main int
+def main(argc int, argv **char) int
     a := "hello"
+    ap := **char(&a)
     println "{a =p}"
     println "{a =s}"
     *a = 'y'
     *(a + 1) = 'i'
+    *(*ap + 4) = 'i'
     println "{a =s}"
     return 0

@@ -305,8 +305,11 @@ class CompilationUnit():
 
 
     def is_type(self, type_name):
-        base_type = type_name.lstrip("*")
-        return base_type in self.types.keys()
+        if is_atom(type_name):
+            base_type = type_name.lstrip("*")
+            return base_type in self.types.keys()
+
+        return False
 
 
     def compile_while(self, pred, body):
@@ -472,11 +475,13 @@ class CompilationUnit():
         return [printf_format, *vargs]
 
 
-    def compile_expression(self, x, depth=0):
+    def macro_expand(self, x):
         if is_atom(x):
-            return self.mangle(x)
+            return x
 
-        # print(x)
+        if x == ['ie/infix']:
+            return ''
+
         head, *rest = x
 
         if head == 'print':
@@ -490,8 +495,6 @@ class CompilationUnit():
 
         while head in ['ie/infix', 'ie/neoteric']:
             if head == 'ie/infix':
-                if x == ['ie/infix']:
-                    return ''
                 # print(1,head, rest)
                 nx = transform_infix(rest)
                 if is_atom(nx):
@@ -501,15 +504,31 @@ class CompilationUnit():
                 if rest == []:
                     return head
             elif head == 'ie/neoteric':
-                if rest[0] == '*':
-                    rest[0] = 'deref'
+                assert len(rest) == 2
 
-                if rest[1][0] == 'ie/prefix':
+                if rest[0] == '*':
+                    head = 'deref'
+                    rest = rest[1:]
+                elif rest[1][0] == 'ie/prefix':
                     aname = rest[0]
                     index = transform_infix(rest[1][1:])
                     head, *rest = ['aref', aname, index]
                 else:
                     head, *rest = rest
+
+        nx = [head, *rest]
+        # print("nx:", nx)
+        return nx
+
+
+    def compile_expression(self, x, depth=0):
+        nx = self.macro_expand(x)
+
+        if is_atom(nx):
+            return self.mangle(nx)
+
+        # print(x)
+        head, *rest = nx
 
         args, body = split_newline(rest)
         assert body == ()
@@ -531,7 +550,8 @@ class CompilationUnit():
             assert len(cargs) == 1
             return f"{cargs[0]} += 1"
         elif head == 'aref':
-            assert len(cargs) == 2
+            if len(cargs) != 2:
+                raise ValueError(f"{head=} {cargs=}")
             aname, aindex = cargs
             return f"{aname}[{aindex}]"
         elif head == 'deref':
