@@ -3,7 +3,15 @@ include-lib "stdio.h"
 def main int
     a := array(10, char, "hi")
     println "{a s}"
-    a[1] = 'o'
+
+    a[0] = 'y'
+    aref(a, 1) = 'e'
+    [aref a 2] = 'l'
+    {a 3 aref} = 'l'
+    a[4] = 'o'
+    a[5] = 'w'
+    a[6] = '\0'
+
     println "{a s}"
     return 0
 

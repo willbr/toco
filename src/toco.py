@@ -479,8 +479,10 @@ class CompilationUnit():
         if is_atom(x):
             return x
 
-        if x == ['ie/infix']:
-            return ''
+        if x == []:
+            return []
+        elif x == ['ie/infix']:
+            return []
 
         head, *rest = x
 
@@ -493,30 +495,55 @@ class CompilationUnit():
         elif head == 'fprintln':
             return self.compile_fprintln_macro(*rest)
 
-        while head in ['ie/infix', 'ie/neoteric']:
-            if head == 'ie/infix':
-                # print(1,head, rest)
+        while head in ['ie/prefix', 'ie/infix', 'ie/postfix', 'ie/neoteric']:
+            if head == 'ie/prefix':
+                head, *rest = rest
+            elif head == 'ie/infix':
                 nx = transform_infix(rest)
                 if is_atom(nx):
                     return self.mangle(nx)
                 head, *rest = nx
-                # print(2,head, rest)
                 if rest == []:
                     return head
+            elif head == 'ie/postfix':
+                head = rest[-1]
+                rest = rest[:-1]
             elif head == 'ie/neoteric':
                 assert len(rest) == 2
+                cmd, args = rest
 
-                if rest[0] == '*':
-                    head = 'deref'
-                    rest = rest[1:]
-                elif rest[1][0] == 'ie/prefix':
+                if cmd == '*':
+                    cmd = 'deref'
+
+                if args[0] == 'ie/prefix':
                     aname = rest[0]
                     index = transform_infix(rest[1][1:])
                     head, *rest = ['aref', aname, index]
+                elif args[0] == 'ie/infix':
+                    # print(1,[head, *rest])
+                    nargs = self.macro_expand(args)
+                    # print(2,nargs)
+                    if ',' in args:
+                        head, *rest = [cmd, *nargs]
+                    else:
+                        head, *rest = [cmd, nargs]
+
+                    # if len(args) == 2:
+                        # head, *rest = [cmd, nargs]
+                    # else:
+                        # head, *rest = [cmd, *nargs]
+                    # print(3,[head, *rest])
+                    # exit(1)
+                elif args[0] == 'ie/postfix':
+                    assert False
                 else:
-                    head, *rest = rest
+                    assert False
+                # print(x)
+                # print([head, *rest])
+                # exit(1)
 
         nx = [head, *rest]
+        # print("x:", x)
         # print("nx:", nx)
         return nx
 
@@ -526,6 +553,9 @@ class CompilationUnit():
 
         if is_atom(nx):
             return self.mangle(nx)
+
+        if nx == []:
+            return ''
 
         # print(x)
         head, *rest = nx
