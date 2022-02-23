@@ -1,7 +1,7 @@
 include-lib "stdio.h"
 
 def main int
-    a := array(10, char, "hi")
+    var a array(10, char) "hi"
     println "{a s}"
 
     a[0] = 'y'
