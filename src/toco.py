@@ -476,7 +476,10 @@ class CompilationUnit():
 
 
     def compile_expression(self, x, depth=0):
+        # print(f"{x=}")
         nx = self.macro_expand(x)
+        # print(f"{nx=}")
+        # print()
 
         if is_atom(nx):
             return self.mangle(nx)
@@ -508,7 +511,11 @@ class CompilationUnit():
             return f"{aname}[{aindex}]"
         elif head == 'deref':
             assert len(cargs) == 1
-            return f"*{cargs[0]}"
+            target = cargs[0]
+            if is_atom(target):
+                return f"*{target}"
+            else:
+                return f"*({target})"
         else:
             return f"{head}({', '.join(cargs)})"
 

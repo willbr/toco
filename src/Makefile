@@ -22,15 +22,17 @@ wrun-tests:
 	watchexec -cr "make run-tests"
 
 d := tests/c11-malloc
-d := tests/c13-pointers
 d := tests/c01-getchar
 d := tests/c12-array
+d := tests/c13-pointers
 
 run-tests:
-	$(ignore) type $d\in.txt
-	$(ignore) toco $d\in.txt
+	$(ignore) type $d/in.txt
+	$(ignore) toco $d/in.txt
 	$(ignore) tcc -run temp.c one two three
+	$(ignore)
 	python test-python.py
-	$(ignore) type $d\out.txt
-	$(ignore) type $d\out.txt | tcc -run -
+	$(ignore) type $d/out.txt
+	$(ignore)
+	$(cat) $d/out.txt | tcc -run -
 

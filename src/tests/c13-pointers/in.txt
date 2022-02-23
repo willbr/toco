@@ -1,6 +1,9 @@
 include-lib "stdio.h"
 
 def main(argc int, argv **char) int
+    var filename *char *(argv + 1)
+    println "{filename =s}"
+
     var a *char "hello"
     var ap **char &a
     println "{a =p}"
@@ -9,4 +12,5 @@ def main(argc int, argv **char) int
     *(a + 1) = 'i'
     *(*ap + 4) = 'i'
     println "{a =s}"
+
     return 0
