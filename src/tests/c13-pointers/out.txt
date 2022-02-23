@@ -1,10 +1,9 @@
-typedef char *cstring;
 #include <stdio.h>
 
 int
 main(int argc, char **argv) {
-    cstring a = "hello";
-    char **ap = (char **)&a;
+    char *a = "hello";
+    char **ap = &a;
     printf("a=%p\n", a);
     printf("a=%s\n", a);
     *a = 'y';

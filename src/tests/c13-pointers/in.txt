@@ -1,8 +1,8 @@
 include-lib "stdio.h"
 
 def main(argc int, argv **char) int
-    a := "hello"
-    ap := **char(&a)
+    var a *char "hello"
+    var ap **char &a
     println "{a =p}"
     println "{a =s}"
     *a = 'y'

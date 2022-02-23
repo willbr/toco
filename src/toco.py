@@ -34,17 +34,10 @@ class Rope():
 class CompilationUnit():
     def __init__(self, filename=None):
         self.libs = []
-        self.types = {
-                'char': 'short',
-                'short': 'short',
-                'int': 'int',
-                'long': 'long',
-                }
         self.structs = {}
         self.functions = {}
         self.global_vars = {}
         self.top_level = []
-        self.toco_header = []
         self.keywords = []
         self.infix_symbols = """
         = := == !=
@@ -226,8 +219,6 @@ class CompilationUnit():
             return self.compile_while(args, body)
         elif head == 'var':
             return self.compile_var(args, body) + ";"
-        elif head == ':=':
-            return self.compile_let(args, body) + ";"
         elif head == 'if':
             return self.compile_if(args, body)
         elif head == 'comment':
@@ -240,76 +231,13 @@ class CompilationUnit():
         return ce + ";"
 
 
-    def compile_let(self, args, body):
+    def compile_var(self, args, body):
         assert body == []
-        num_args = len(args)
-        assert num_args == 2
-
-        var_name, x = args
-        var_type = self.infer_type(x)
-
-        if var_type[0] == 'array':
-            var_val = initial_array_value(x)
-        else:
-            var_val = self.compile_expression(x)
-
-        if var_type == 'cstring':
-            h = "typedef char *cstring;"
-            if h not in self.toco_header:
-                self.toco_header.append(h)
-
-        if x[0] == 'ie/neoteric':
-            _, cmd, arg = x
-            if cmd in self.types.keys():
-                if cmd == var_type:
-                    var_val = self.compile_expression(arg)
-
-        return self.compile_var_decl(var_name, var_type, var_val)
-
-
-    def infer_type(self, x):
-        if is_atom(x):
-            first_char = x[0]
-            if first_char == ':':
-                return 'toco_keyword'
-            elif first_char == '"':
-                return 'cstring'
-
-            try:
-                n = int(x)
-                return 'int'
-            except ValueError:
-                pass
-
-            try:
-                n = float(x)
-                return 'float'
-            except ValueError:
-                pass
-
-            return 'symbol'
-
-        n = len(x)
-        head, *rest = x
-        if head == 'ie/neoteric':
-            cmd = rest[0]
-            if self.is_type(cmd):
-                return cmd
-            elif cmd == 'array':
-                infix, alen, comma1, atype = rest[1][:4]
-                return ['array', alen, atype]
-            params, returns, body = self.functions[cmd]
-            return returns
-        else:
-            assert False
-
-
-    def is_type(self, type_name):
-        if is_atom(type_name):
-            base_type = type_name.lstrip("*")
-            return base_type in self.types.keys()
-
-        return False
+        var_name, var_type, var_value = args
+        assert is_atom(var_name)
+        xtype = self.macro_expand(var_type)
+        decl = self.compile_var_decl(var_name, xtype, var_value)
+        return decl
 
 
     def compile_while(self, pred, body):
@@ -333,7 +261,6 @@ class CompilationUnit():
             member_name, member_type, nl = member_spec
             assert nl == 'ie/newline'
             struct_spec[member_name] = member_type
-        self.types[struct_name] = ['struct', struct_spec]
         self.structs[struct_name] = struct_spec
 
         struct_decl = [f"struct {struct_name} {{"]
@@ -571,11 +498,6 @@ class CompilationUnit():
                 return "(" + r + ")"
             else:
                 return r
-        elif self.is_type(head):
-            assert len(cargs) == 1
-            cast_name = self.compile_var_decl("", head)
-            # return f"({cast_name})({', '.join(cargs)})"
-            return f"({cast_name}){cargs[0]}"
         elif head == "inc":
             assert len(cargs) == 1
             return f"{cargs[0]} += 1"
@@ -666,9 +588,6 @@ class CompilationUnit():
 
     def render(self):
         lines = Rope()
-
-        for e in self.toco_header:
-            lines.write_line(e)
 
         for e in self.top_level:
             lines.write_line(e)
@@ -833,19 +752,6 @@ def is_string_literal(s):
     if len(s) < 2:
         return False
     return s[0] == '"' and s[-1] == '"'
-
-
-def initial_array_value(x):
-    n = len(x)
-    head, *rest = x
-    if head == 'ie/neoteric':
-        cmd = rest[0]
-        if cmd != 'array':
-            assert False
-        infix, alen, comma1, atype, comma2, aval = rest[1]
-        return aval
-    print(a)
-    assert False
 
 
 if __name__ == "__main__":

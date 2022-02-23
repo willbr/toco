@@ -1,5 +1,5 @@
 def main(argc int, argv **char) int
-    a := double(10)
+    var a int double(10)
     return a
 
 
