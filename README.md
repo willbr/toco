@@ -24,7 +24,7 @@ main(void)
 ## go ish function declrations
 
     def main(argc int, argv **char) int
-        a := double(10)
+        var a int double(10)
         return a
 
 
@@ -47,6 +47,6 @@ unique enums
     include-lib "stdio.h"
 
     def main(argc int, argv **char) int
-        poop := :poop
+        var poop toco_keyword :poop
         println "{poop =d}"
 
