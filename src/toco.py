@@ -85,7 +85,16 @@ class CompilationUnit():
 
 
     def compile(self, x):
+
+        if is_atom(x):
+            if x == 'ie/newline':
+                self.top_level.append('')
+            else:
+                assert False
+            return
+
         head, *args = x
+
         if head == 'def':
             self.compile_proc(*args)
         elif head == 'func-decl':
@@ -198,6 +207,13 @@ class CompilationUnit():
 
 
     def compile_statement(self, x):
+
+        if is_atom(x):
+            if x == 'ie/newline':
+                return ''
+            else:
+                assert False
+
         head, *rest = x
         args, body = split_newline(rest)
 
@@ -590,10 +606,16 @@ class CompilationUnit():
 
 
     def mangle(self, name):
+        t = type(name)
+
+        if t != str:
+            return str(name)
+
         if name == '':
             return ''
         elif name == 'null':
             return 'NULL'
+
 
         x = name.replace('-', '_')
         if x[0] == ':':
