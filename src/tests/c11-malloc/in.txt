@@ -4,6 +4,7 @@ include-lib "string.h"
 
 def main(argc int, argv **char) int
     var s *char malloc(256)
+
     memcpy s "hello" 6
     println "{s s}"
 

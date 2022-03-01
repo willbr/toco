@@ -4,6 +4,7 @@ int
 main(int argc, char **argv) {
     char *filename = *(argv + 1);
     printf("filename=%s\n", filename);
+
     char *a = "hello";
     char **ap = &a;
     printf("a=%p\n", a);
@@ -12,6 +13,7 @@ main(int argc, char **argv) {
     *(a + 1) = 'i';
     *(*ap + 4) = 'i';
     printf("a=%s\n", a);
+
     return 0;
 }
 

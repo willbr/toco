@@ -4,6 +4,7 @@ int
 main(void) {
     char a[10] = "hi";
     printf("%s\n", a);
+
     a[0] = 'y';
     a[1] = 'e';
     a[2] = 'l';
@@ -11,6 +12,7 @@ main(void) {
     a[4] = 'o';
     a[5] = 'w';
     a[6] = '\0';
+
     printf("%s\n", a);
     return 0;
 }
