@@ -644,6 +644,9 @@ class CompilationUnit():
         for e in self.top_level:
             lines.write_line(e)
 
+        if self.top_level and self.top_level[-1] != '':
+            lines.write_line("")
+
         func_decls = 0
         for name, spec in self.functions.items():
             if name == 'main':
