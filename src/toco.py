@@ -6,6 +6,7 @@ from ie.src.py.parse2_syntax import is_atom, puts_expr
 from ie.src.py.ie import parse_file
 from rich.console import Console
 from rich.traceback import install
+from pathlib import Path
 
 install(show_locals=True)
 
@@ -836,6 +837,11 @@ if __name__ == "__main__":
         cu.print()
     else:
         lines = cu.render()
+
+        out_path = Path(args.outfile)
+        if not out_path.parent.exists():
+            raise FileNotFoundError(f"parent folder doesn't exist: {out_path.parent}")
+
         with open(args.outfile, 'w') as f:
             f.write(lines)
 
