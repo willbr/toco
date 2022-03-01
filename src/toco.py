@@ -552,7 +552,10 @@ class CompilationUnit():
             if len(cargs) != 2:
                 raise ValueError(f"{head=} {cargs=}")
             aname, aindex = cargs
-            return f"{aname}[{aindex}]"
+            if is_atom(args[0]):
+                return f"{aname}[{aindex}]"
+            else:
+                return f"({aname})[{aindex}]"
         elif head == 'deref':
             assert len(cargs) == 1
             target = cargs[0]
