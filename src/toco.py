@@ -27,6 +27,12 @@ class Rope():
         self.lines[-1].append(line)
         self.lines.append([])
 
+    def last_line(self):
+        return ''.join(self.lines[-1])
+
+    def last_line_isnt_empty(self):
+        return self.last_line() != ''
+
     def render(self):
         return '\n'.join(''.join(line) for line in self.lines)
 
@@ -88,7 +94,13 @@ class CompilationUnit():
 
         if is_atom(x):
             if x == 'ie/newline':
-                self.top_level.append('')
+                try:
+                    prev = self.top_level[-1]
+                except IndexError:
+                    prev = ''
+
+                if prev != '':
+                    self.top_level.append('')
             else:
                 assert False
             return
@@ -295,7 +307,7 @@ class CompilationUnit():
             decl = self.compile_var_decl(member_name, member_type)
             struct_decl.append(f"    {decl};")
         struct_decl.append("};")
-        self.top_level.append('\n'.join(struct_decl) + '\n')
+        self.top_level.append('\n'.join(struct_decl))
 
 
     def compile_globals(self, body):
@@ -597,8 +609,8 @@ class CompilationUnit():
         decl = f"{var_type} {lhs}{var_name}{rhs}"
 
         if is_struct and initial_value:
-            decl += " = {" + ', '.join(struct_values) + "}"
-        elif initial_value:
+            decl += " = {" + ', '.join(map(str, struct_values)) + "}"
+        elif initial_value != None:
             ce = self.compile_expression(initial_value)
             decl += f" = {ce}"
 
@@ -632,9 +644,6 @@ class CompilationUnit():
         for e in self.top_level:
             lines.write_line(e)
 
-        if self.top_level:
-            lines.write_line("")
-
         func_decls = 0
         for name, spec in self.functions.items():
             if name == 'main':
@@ -643,20 +652,29 @@ class CompilationUnit():
             if body == ():
                 continue
             print_func_decl(lines, name, params, returns, ' ', ';')
+            lines.write_line("")
+
             func_decls += 1
 
         if func_decls:
             lines.write_line("")
 
+        if lines.last_line_isnt_empty():
+            lines.write_line("")
 
+        sep = None
         for name, spec in self.functions.items():
             params, returns, body = spec
             if body == ():
                 continue
+            if sep != None:
+                lines.write_line(sep)
             print_func_decl(lines, name, params, returns, '\n', ' ')
 
             print_block(lines, body, 1)
             lines.write_line("")
+
+            sep = ""
 
         return lines.render()
 
@@ -775,7 +793,9 @@ def print_block(lines, body, depth):
     lines.write_line("{")
 
     for s in body:
-        lines.write(indent)
+        if s != '':
+            lines.write(indent)
+
         if isinstance(s, str):
             lines.write_line(s)
         else:
