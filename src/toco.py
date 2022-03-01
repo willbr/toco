@@ -46,10 +46,14 @@ class CompilationUnit():
         self.top_level = []
         self.keywords = []
         self.infix_symbols = """
-        = := == !=
+        = == !=
         + += - -= * *= / /=
+        % %=
         > >= < <=
+        && ||
         and or
+        & &= | |= ^ ^=
+        << <<= >> >>=
         """.split()
         self.filenames = []
         self.lib_directories = []
