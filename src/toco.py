@@ -540,7 +540,8 @@ class CompilationUnit():
 
         if head in self.infix_symbols:
             # print(head, cargs)
-            r =  f" {head} ".join(cargs)
+            mhead = self.mangle(head)
+            r =  f" {mhead} ".join(cargs)
             if depth:
                 return "(" + r + ")"
             else:
@@ -633,8 +634,14 @@ class CompilationUnit():
 
         if name == '':
             return ''
+        elif name == '-':
+            return '-'
         elif name == 'null':
             return 'NULL'
+        elif name == 'and':
+            return '&&'
+        elif name == 'or':
+            return '||'
 
 
         x = name.replace('-', '_')
