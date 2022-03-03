@@ -4,6 +4,7 @@ import argparse
 
 from ie.src.py.parse2_syntax import is_atom, puts_expr
 from ie.src.py.ie import parse_file
+from ie.src.py.promote import promote_token
 from rich.console import Console
 from rich.traceback import install
 from pathlib import Path
@@ -424,7 +425,8 @@ class CompilationUnit():
             except ValueError:
                 lhs, rhs = rhs, ''
             a, text = lhs.split("}")
-            v, fmt = a.rsplit(" ", 1)
+            t, fmt = a.rsplit(" ", 1)
+            v = promote_token(t)
             vargs.append(v)
 
             if fmt[0] == '=':
