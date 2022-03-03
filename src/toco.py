@@ -388,31 +388,27 @@ class CompilationUnit():
     def compile_print_macro(self, *args):
         assert len(args) == 1
         print_args = self.parse_format_string(args[0])
-        cargs = ', '.join(self.compile_expression(s) for s in print_args)
-        return f"printf({cargs})"
+        return ['printf', *print_args]
 
 
     def compile_println_macro(self, *args):
         assert len(args) == 1
         print_args = self.parse_format_string(args[0], True)
-        cargs = ', '.join(self.compile_expression(s) for s in print_args)
-        return f"printf({cargs})"
+        return ['printf', *print_args]
 
 
     def compile_fprint_macro(self, *args):
         file, fmt = args
         print_args = self.parse_format_string(fmt)
         print_args.insert(0, file)
-        cargs = ', '.join(self.compile_expression(s) for s in print_args)
-        return f"fprintf({cargs})"
+        return ['printf', *print_args]
 
 
     def compile_fprintln_macro(self, *args):
         file, fmt = args
         print_args = self.parse_format_string(fmt, True)
         print_args.insert(0, file)
-        cargs = ', '.join(self.compile_expression(s) for s in print_args)
-        return f"fprintf({cargs})"
+        return ['printf', *print_args]
 
     
     def parse_format_string(self, fmt, append_newline=False):
