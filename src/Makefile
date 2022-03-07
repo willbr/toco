@@ -25,6 +25,7 @@ d := tests/c11-malloc
 d := tests/c01-getchar
 d := tests/c12-array
 d := tests/c13-pointers
+d := tests/c15-macros
 
 
 l_in := $d/in.txt
@@ -46,6 +47,5 @@ run-tests:
 	$(ignore)
 	python test-python.py
 	$(ignore) type $(out)
-	$(ignore)
-	$(cat) $(out) | tcc -run -
+	$(ignore) $(cat) $(out) | tcc -run -
 

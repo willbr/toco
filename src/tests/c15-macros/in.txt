@@ -1,0 +1,3 @@
+hash-if defined(__WIN32__)
+    include-lib "test.h"
+

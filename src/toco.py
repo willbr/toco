@@ -41,7 +41,6 @@ class Rope():
 
 class CompilationUnit():
     def __init__(self, filename=None):
-        self.libs = []
         self.structs = {}
         self.functions = {}
         self.global_vars = {}
@@ -97,7 +96,6 @@ class CompilationUnit():
 
 
     def compile(self, x):
-
         if is_atom(x):
             if x == 'ie/newline':
                 try:
@@ -118,7 +116,7 @@ class CompilationUnit():
         elif head == 'func-decl':
             self.compile_func_decl(*args)
         elif head == 'include-lib':
-            self.compile_lib(*args)
+            self.top_level.append(self.compile_lib(*args))
         elif head == 'import':
             self.compile_import(*args)
         elif head == 'struct':
@@ -129,6 +127,9 @@ class CompilationUnit():
             self.compile_typedef(*args)
         elif head == 'define':
             self.compile_define(*args)
+        elif head == 'hash-if':
+            cx = self.compile_hash_if(*args)
+            self.top_level.extend(cx)
         elif head == 'comment':
             self.top_level.append(compile_comment(*args))
         elif head == 'enum':
@@ -185,14 +186,13 @@ class CompilationUnit():
         self.functions[fn_name] = [params, returns, body]
 
 
-    def compile_lib(self, lib_name, *body):
-        assert body[0] == 'ie/newline'
-        body = body[1:]
+    def compile_lib(self, *args):
+        first_line, body = split_newline(args)
+        assert len(first_line) == 1
         assert len(body) == 0
-        self.libs.append(lib_name)
-        name = lib_name.strip('"')
+        name = first_line[0].strip('"')
         clib = f"#include <{name}>"
-        self.top_level.append(clib)
+        return clib
 
 
     def compile_import(self, lib_name, *body):
@@ -264,7 +264,10 @@ class CompilationUnit():
 
         assert body == [] or body == ()
         ce = self.compile_expression([head, *args])
-        return ce + ";"
+        if head in ['include-lib']:
+            return ce
+        else:
+            return ce + ";"
 
 
     def compile_var(self, args, body):
@@ -353,6 +356,20 @@ class CompilationUnit():
             assert False
         decl = f"#define {define_name}{sep}{dbody}"
         self.top_level.append(decl)
+
+
+    def compile_hash_if(self, *args):
+        lines = []
+        pred, body = split_newline(args)
+        cpred = self.compile_expression(transform_infix(pred))
+        cbody = [self.compile_statement(s) for s in body]
+
+        lines.append(f"#if {cpred}")
+        for s in body:
+            x = self.compile_statement(s)
+            lines.append(f"    {x}")
+        lines.append("#endif")
+        return lines
 
 
     def compile_if(self, pred, body):
@@ -562,6 +579,8 @@ class CompilationUnit():
                 return f"*{target}"
             else:
                 return f"*({target})"
+        elif head == "include-lib":
+            return self.compile_lib(*args)
         else:
             return f"{head}({', '.join(cargs)})"
 
